@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Worldbook Studio 世界书书架：选择一本世界书，进入 AI 文学二创工作台。">
+  <title>世界书书架 · Worldbook Studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23913b3b'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-size='18' fill='white'%3E书%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css?v=38">
+  <style>
+    .shelf-page { min-height: 100vh; background: var(--surface); }
+    .shelf-wrap { max-width: 1040px; margin: 0 auto; padding: 64px 28px 80px; }
+    .shelf-head { margin-bottom: 44px; }
+    .shelf-head .brand-row { display: flex; align-items: center; gap: 13px; margin-bottom: 28px; }
+    .shelf-head .brand-row .brand-seal { width: 46px; height: 46px; font-size: 21px; }
+    .shelf-head h1 { font: 600 40px/1.25 var(--serif); letter-spacing: .04em; margin-bottom: 12px; }
+    .shelf-head p { color: var(--muted); font-size: 14px; line-height: 1.8; max-width: 620px; }
+    .shelf-grid-page { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .shelf-book { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 13px;
+      background: var(--paper); overflow: hidden; text-decoration: none; color: inherit;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+    .shelf-book:hover { transform: translateY(-3px); border-color: var(--book-color, var(--cinnabar));
+      box-shadow: 0 12px 28px rgba(0,0,0,.08); }
+    .shelf-book-cover { height: 118px; display: flex; align-items: center; gap: 15px; padding: 0 24px;
+      background: var(--book-soft, var(--cinnabar-soft)); border-bottom: 1px solid var(--line); }
+    .shelf-book-seal { width: 54px; height: 54px; flex: none; display: grid; place-items: center; border-radius: 10px;
+      background: var(--book-color, var(--cinnabar)); color: #fff; font: 600 26px var(--serif); }
+    .shelf-book-cover h2 { font: 600 22px var(--serif); line-height: 1.3; }
+    .shelf-book-cover small { display: block; margin-top: 4px; font-size: 11px; color: var(--muted); letter-spacing: .06em; }
+    .shelf-book-body { flex: 1; padding: 18px 24px 20px; display: flex; flex-direction: column; gap: 14px; }
+    .shelf-book-tagline { font-size: 13px; line-height: 1.75; color: var(--ink); }
+    .shelf-book-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: auto; }
+    .shelf-book-stats div { text-align: center; }
+    .shelf-book-stats strong { display: block; font: 600 17px var(--serif); color: var(--book-color, var(--cinnabar)); }
+    .shelf-book-stats span { display: block; margin-top: 2px; font-size: 10px; color: var(--muted); }
+    .shelf-book-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 11px 24px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+    .shelf-book-foot .enter { display: inline-flex; align-items: center; gap: 5px; color: var(--book-color, var(--cinnabar)); }
+    .shelf-book-foot .icon { width: 13px; }
+    .shelf-add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px;
+      border: 1px dashed var(--line); border-radius: 13px; padding: 34px 24px; color: var(--muted);
+      text-align: center; font-size: 12px; line-height: 1.7; background: transparent; }
+    .shelf-add code { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: var(--gold-soft); color: var(--ink); }
+    .shelf-footnote { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line);
+      font-size: 11px; color: var(--muted); line-height: 1.9; }
+    @media (max-width: 640px) {
+      .shelf-wrap { padding: 38px 18px 56px; }
+      .shelf-head h1 { font-size: 29px; }
+      .shelf-grid-page { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="shelf-page">
+  <main class="shelf-wrap">
+    <header class="shelf-head">
+      <div class="brand-row">
+        <div class="brand-seal" aria-hidden="true">书</div>
+        <div><strong style="font:600 15px var(--serif)">WORLDBOOK STUDIO</strong><span style="display:block;font-size:10px;letter-spacing:.14em;color:var(--muted)">世界书书架</span></div>
+      </div>
+      <h1>选择一本世界书</h1>
+      <p>每本书都有自己的创作法则、人物档案与关系网。进入之后，可以调用其中的资产写原创番外；也可以把另一本书的人物请进来，做跨界创作。</p>
+    </header>
+
+    <div class="shelf-grid-page" id="shelfGrid">
+      <p style="color:var(--muted);font-size:13px">正在读取世界书目录…</p>
+    </div>
+
+    <p class="shelf-footnote" id="shelfFootnote">
+      新增世界书：在 <code>worlds/</code> 下建一个目录，放入 <code>world.json</code> 与数据文件，再在 <code>worlds/index.json</code> 的清单里追加一项即可，无需改动代码。
+    </p>
+  </main>
+
+  <!--WORLD_SCRIPTS-->
+  <script src="registry.js?v=1"></script>
+  <script src="shelf.js?v=2"></script>
+</body>
+</html>

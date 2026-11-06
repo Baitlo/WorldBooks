@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="红楼一梦 Worldbook Studio，基于《红楼梦》世界观的 AI 文学二创工作台。">
+  <title>红楼一梦 · Worldbook Studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23913b3b'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-size='21' fill='white'%3E%E6%A2%A6%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css?v=51">
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="icon-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></symbol>
+    <symbol id="icon-pen" viewBox="0 0 24 24"><path d="m12 20 9-9-8-8-9 9-1 9 9-1Z"/><path d="m14 5 5 5M3 21l6-6"/></symbol>
+    <symbol id="icon-branch" viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="19" r="2"/><path d="M6 7v10M8 9c4 0 3-3 8-3"/></symbol>
+    <symbol id="icon-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-6 9c-.7 1.2.1 3 1.6 3h12.8c1.5 0 2.3-1.8 1.6-3l-6-9V3"/><path d="M7 15h10"/></symbol>
+    <symbol id="icon-network" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M12 8v4M5 16v-2h14v2"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="7" cy="18" r="2"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></symbol>
+    <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
+    <symbol id="icon-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4 20-7Z"/><path d="M22 2 11 13"/></symbol>
+    <symbol id="icon-spark" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="icon-file" viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6V2Z"/><path d="M14 2v5h5M9 12h6M9 16h6"/></symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="icon-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></symbol>
+    <symbol id="icon-undo" viewBox="0 0 24 24"><path d="m9 7-5 5 5 5M4 12h9a6 6 0 0 1 6 6"/></symbol>
+    <symbol id="icon-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z"/></symbol>
+    <symbol id="icon-quote" viewBox="0 0 24 24"><path d="M9 11H4a6 6 0 0 1 6-6v2a4 4 0 0 0-4 4h3v6H4v-6M20 11h-5a6 6 0 0 1 6-6v2a4 4 0 0 0-4 4h3v6h-5v-6"/></symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"/></symbol>
+  </svg>
+
+  <div class="library-sync hidden" id="librarySync" role="status" aria-live="polite"></div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="主导航">
+      <div class="brand">
+        <div class="brand-seal" id="brandSeal" aria-hidden="true">梦</div>
+        <div><strong id="brandTitle">红楼一梦</strong><span>WORLDBOOK STUDIO</span></div>
+      </div>
+
+      <button class="world-switcher" data-action="open-world-picker" title="切换世界书">
+        <span class="world-cover" id="worldCover">红</span>
+        <span><strong id="worldName">红楼梦</strong><small id="worldSub">文学 IP 世界书</small></span>
+        <svg class="icon"><use href="#icon-chevron"/></svg>
+      </button>
+
+      <nav class="nav-list">
+        <p class="nav-label">创作空间</p>
+        <button class="nav-item active" data-action="switch-view" data-view="world"><svg class="icon"><use href="#icon-book"/></svg><span>世界书</span><span class="nav-count" id="worldEntryNavCount">61</span></button>
+        <button class="nav-item" data-action="switch-view" data-view="creations"><svg class="icon"><use href="#icon-branch"/></svg><span>我的创作</span><span class="nav-dot" id="projectNavDot"></span></button>
+        <button class="nav-item" data-action="switch-view" data-view="evaluation"><svg class="icon"><use href="#icon-flask"/></svg><span>评测实验室</span></button>
+        <p class="nav-label nav-label-spaced">世界管理</p>
+        <button class="nav-item" data-action="open-relations"><svg class="icon"><use href="#icon-network"/></svg><span>人物关系</span></button>
+        <button class="nav-item" data-action="open-cross" id="crossNavBtn"><svg class="icon"><use href="#icon-network"/></svg><span>跨界引用</span><span class="nav-dot hidden" id="crossNavDot"></span></button>
+        <button class="nav-item" data-action="switch-view" data-view="prompt"><svg class="icon"><use href="#icon-settings"/></svg><span>创作核心指令</span></button>
+      </nav>
+
+      <div class="sidebar-note">
+        <div class="sidebar-note-icon"><svg class="icon"><use href="#icon-spark"/></svg></div>
+        <strong id="sidebarNoteTitle">让世界观成为创作起点</strong>
+        <p id="sidebarNoteText">不是复述原著，而是在相同的人情与礼法中，写出另一条故事线。</p>
+        <button data-action="new-creation">开始一个新故事<svg class="icon"><use href="#icon-arrow"/></svg></button>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="local-status"><i></i><span id="sidebarAiStatus">正在检测 AI</span></span>
+        <button class="icon-button small" data-action="reset-demo" title="重置演示数据" aria-label="重置演示数据"><svg class="icon"><use href="#icon-undo"/></svg></button>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button mobile-menu" data-action="toggle-sidebar" aria-label="打开导航"><svg class="icon"><use href="#icon-menu"/></svg></button>
+          <div class="breadcrumb"><span id="breadcrumbBrand">红楼一梦</span><svg class="icon"><use href="#icon-chevron"/></svg><strong id="currentViewLabel">世界书</strong></div>
+        </div>
+        <div class="topbar-actions">
+          <button class="search-trigger" data-action="global-search"><svg class="icon"><use href="#icon-search"/></svg><span>搜索世界书</span><kbd>/</kbd></button>
+          <button class="icon-button" data-action="export-worldbook" title="导出世界书 JSON" aria-label="导出世界书"><svg class="icon"><use href="#icon-download"/></svg></button>
+          <button class="icon-button" data-action="toggle-theme" title="切换明暗主题" aria-label="切换明暗主题"><svg class="icon theme-icon"><use href="#icon-moon"/></svg></button>
+          <button class="button primary assistant-open" data-action="toggle-assistant"><svg class="icon"><use href="#icon-panel"/></svg>创作助手</button>
+        </div>
+      </header>
+
+      <div class="workspace-scroll" id="workspaceScroll">
+        <section class="view" id="view-world">
+          <div class="world-hero">
+            <div class="hero-copy">
+              <div class="eyebrow" id="heroEyebrow"><span class="canon-dot"></span>前八十回世界观基准<span class="eyebrow-divider"></span>原创故事独立标记</div>
+              <h1 id="heroTitle">在同一座大观园，<br>写未曾发生的故事。</h1>
+              <p id="heroSub">调用人物、事件、场景与文学风格，让每一次续写都有据可依，也有新的可能。</p>
+              <div class="hero-actions">
+                <button class="button primary" data-action="start-writing"><svg class="icon"><use href="#icon-pen"/></svg>开始文学创作</button>
+                <button class="button text-button" data-action="switch-view" data-view="creations">查看我的分支<svg class="icon"><use href="#icon-arrow"/></svg></button>
+              </div>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+              <svg viewBox="0 0 440 220" fill="none">
+                <path d="M32 190h375M76 190v-62h119v62M63 128h145l-25-22H89l-26 22ZM100 106V82h67v24M88 82h92l-18-17h-55L88 82Z"/>
+                <path d="M111 190v-43h31v43M158 190v-43h20v43M241 190v-97M213 190v-56h57v56M201 134h80l-17-17h-46l-17 17Z"/>
+                <path d="M305 190c-7-43 8-77 42-102M330 190c1-53 22-87 59-112M340 123c-22-4-34-18-36-40 22 3 35 16 36 40ZM354 105c3-24 16-38 39-43-2 23-15 38-39 43ZM324 147c-20-1-33-11-40-30 21-1 34 9 40 30Z"/>
+                <circle cx="376" cy="39" r="21"/><path d="M22 203c69-18 122-16 192 0s130 16 207 0"/>
+              </svg>
+              <span id="heroArtLabel">大观园 · 春</span>
+            </div>
+            <div class="hero-metrics">
+              <span><strong id="heroEntryCount">61</strong>项创作资产</span>
+              <span><strong id="heroCharCount">42</strong>位人物档案</span>
+              <span><strong id="heroRelCount">90</strong>组人物关系</span>
+              <span><strong id="heroWorldCount">24</strong>条世界设定</span>
+            </div>
+          </div>
+
+          <div class="asset-heading">
+            <div><h2 id="worldSectionTitle">世界书创作资产</h2><p id="worldSectionDesc">查阅设定，或把词条引用到当前创作中。</p></div>
+            <button class="button secondary compact" data-action="open-asset-picker"><svg class="icon"><use href="#icon-plus"/></svg>引用资料</button>
+          </div>
+
+          <div class="asset-toolbar">
+            <div class="category-tabs" id="assetCategoryTabs" role="tablist" aria-label="世界书资产分类"></div>
+            <label class="asset-search"><svg class="icon"><use href="#icon-search"/></svg><input id="assetSearchInput" type="search" placeholder="搜索人物、事件、场景或设定" autocomplete="off"><kbd>/</kbd></label>
+          </div>
+
+          <div id="assetGrid" class="asset-grid"></div>
+          <div id="relationView" class="relation-view hidden">
+            <div class="relation-toolbar">
+              <div><h3>人物关系网络</h3><p>点击人物查看性格、动机与关系约束，并可直接引用到创作。</p></div>
+                <div class="relation-filters" id="relationFilters">
+                <button class="active" data-action="graph-filter" data-filter="all">全部 <span id="relationTotal">90</span></button>
+                <button data-action="graph-filter" data-filter="kin">亲属</button>
+                <button data-action="graph-filter" data-filter="serve">主仆</button>
+                <button data-action="graph-filter" data-filter="love">情感</button>
+                <button data-action="graph-filter" data-filter="peer">同侪</button>
+                <button data-action="graph-filter" data-filter="power">权力</button>
+                <button data-action="graph-filter" data-filter="feud">对立</button>
+              </div>
+              <button class="brief-chip hidden" id="graphFocusChip" data-action="graph-clear-focus">退出聚焦</button>
+            </div>
+            <div class="relation-canvas" id="relationGraph"></div>
+            <div class="relation-legend">
+              <span><i style="background:#a8874f"></i>亲属</span>
+              <span><i style="background:#88729a"></i>主仆</span>
+              <span><i style="background:#913b3b"></i>情感</span>
+              <span><i style="background:#49675d"></i>同侪</span>
+              <span><i style="background:#7a4a6b"></i>权力</span>
+              <span><i style="background:#b4602f"></i>对立</span>
+              <small>线宽表示关系强度；点击人物可查看档案，选中某人则只显示与之相关的连线与箭头。</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="view hidden" id="view-creations">
+          <div class="page-heading creations-heading">
+            <div><div class="eyebrow">MY STORIES</div><h1>我的创作</h1><p>每一次选择都保留为独立分支，随时回到任一节点重新展开。</p></div>
+            <div class="heading-actions"><button class="button secondary" data-action="export-library-backup">备份作品架</button><button class="button secondary" data-action="import-library-backup">导入备份</button><button class="button secondary" data-action="export-story"><svg class="icon"><use href="#icon-download"/></svg>导出故事</button><button class="button primary" data-action="new-creation"><svg class="icon"><use href="#icon-plus"/></svg>新建创作</button></div>
+          </div>
+
+          <div class="project-shelf" id="projectShelf"></div>
+
+          <article class="project-overview">
+            <div class="project-mark">平</div>
+            <div class="project-info"><div class="project-title-row"><h2 id="projectTitle">平儿的贾府日常</h2><span class="tag original" id="projectTag">原创番外</span></div><p id="projectPrompt"></p><div class="project-meta"><span><svg class="icon"><use href="#icon-book"/></svg><span id="projectWorldLabel">红楼梦世界观</span></span><span><svg class="icon"><use href="#icon-clock"/></svg><span id="projectUpdated">刚刚更新</span></span></div></div>
+            <div class="project-stats"><div><strong id="projectNodeCount">0</strong><span>已写节点</span></div><div><strong id="projectBranchCount">3</strong><span>故事分支</span></div><div><strong id="projectCharCount">0</strong><span>正文字数</span></div></div>
+          </article>
+
+          <div class="branch-section">
+            <div class="section-heading"><div><h2>故事分支树</h2><p>实线节点已经保存，虚线节点是可选方向；双指捏合或 ⌘/Ctrl+滚轮 缩放。</p></div><div class="tree-legend"><span><i class="written"></i>已写</span><span><i class="planned"></i>待选</span></div><div class="tree-zoom"><button data-action="tree-zoom-out" aria-label="缩小分支树">−</button><span id="treeZoomLabel">100%</span><button data-action="tree-zoom-in" aria-label="放大分支树">+</button><button data-action="tree-zoom-reset" aria-label="重置缩放">重置</button></div></div>
+            <div class="branch-tree-scroll"><div class="branch-tree" id="branchTree"></div></div>
+          </div>
+
+          <div class="node-workspace">
+            <div class="node-preview" id="nodePreview"></div>
+            <aside class="version-panel"><div class="section-heading"><h3>创作路径</h3><span id="pathDepth">0 次续写</span></div><div id="versionPath" class="version-path"></div></aside>
+          </div>
+        </section>
+
+        <section class="view hidden" id="view-evaluation">
+          <div class="page-heading">
+            <div><div class="eyebrow">CREATION EVALUATION</div><h1>创作评测实验室</h1><p>评价对象从角色扮演体验，转向世界书驱动的 AI 二创能力。</p></div>
+            <span class="demo-disclosure" id="evalDisclosure"><svg class="icon"><use href="#icon-info"/></svg>结构检查离线复算，AI 评审按需调用模型</span>
+          </div>
+          <div class="evaluation-tabs" id="evaluationTabs">
+            <button class="active" data-action="eval-tab" data-tab="quality">六维检查</button>
+            <button data-action="eval-tab" data-tab="benchmark-a">Benchmark A<span>多故事线</span></button>
+            <button data-action="eval-tab" data-tab="benchmark-b">Benchmark B<span>多轮推荐</span></button>
+            <button data-action="eval-tab" data-tab="compare">A/B 对照</button>
+          </div>
+          <div id="evaluationContent"></div>
+        </section>
+
+        <section class="view hidden" id="view-prompt">
+          <div class="page-heading">
+            <div><div class="eyebrow">WORLD INSTRUCTIONS</div><h1>创作核心指令</h1><p>让世界书提供创作边界，让 AI 提供创作能力，让用户始终拥有方向选择权。</p></div>
+            <button class="button primary" data-action="copy-prompt"><svg class="icon"><use href="#icon-copy"/></svg>复制完整指令</button>
+          </div>
+          <div class="prompt-layout">
+            <article class="prompt-document"><div class="prompt-document-head"><span>SYSTEM PROMPT</span><span id="promptVersionLabel">Worldbook Studio · v2.0</span></div><pre id="systemPromptText"></pre></article>
+            <aside class="prompt-principles"><h3>不可让渡的创作原则</h3><div id="promptPrinciples"></div><div class="prompt-note"><svg class="icon"><use href="#icon-info"/></svg><p id="promptNoteText">原著事实与原创情节分开维护。示例中的账册差错及后续路线均为演示原创，不冒充原著情节。</p></div></aside>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <aside class="assistant" id="assistant" aria-label="AI 创作助手">
+      <header class="assistant-header">
+        <div class="assistant-avatar"><svg class="icon"><use href="#icon-spark"/></svg></div>
+        <div><h2 id="assistantTitle">红楼梦 AI 创作助手</h2><p id="aiStatusLine"><span class="online-dot"></span>正在检测 AI 通道<span class="demo-badge">…</span></p></div>
+        <button class="icon-button ai-settings-button" data-action="open-ai-settings" title="AI 与模型设置" aria-label="AI 与模型设置"><svg class="icon"><use href="#icon-settings"/></svg></button>
+        <button class="icon-button assistant-close" data-action="toggle-assistant" aria-label="关闭创作助手"><svg class="icon"><use href="#icon-x"/></svg></button>
+        <button class="icon-button new-chat-button" data-action="new-creation" title="新建创作" aria-label="新建创作"><svg class="icon"><use href="#icon-plus"/></svg></button>
+      </header>
+      <div class="assistant-modes" role="tablist" aria-label="助手模式">
+        <button data-action="assistant-mode" data-mode="world"><svg class="icon"><use href="#icon-compass"/></svg>认识世界</button>
+        <button data-action="assistant-mode" data-mode="research"><svg class="icon"><use href="#icon-search"/></svg>查询考据</button>
+        <button class="active" data-action="assistant-mode" data-mode="create"><svg class="icon"><use href="#icon-pen"/></svg>文学创作</button>
+      </div>
+      <div class="assistant-body" id="assistantBody"></div>
+      <div class="composer-wrap">
+        <div class="composer-context" id="composerContext"></div>
+        <div class="composer">
+          <textarea id="composerInput" rows="3" placeholder="描述你想写的人物、视角与故事边界…"></textarea>
+          <div class="composer-actions">
+            <div><button class="icon-button small" data-action="upload-material" title="上传 TXT、MD 或 JSON 素材" aria-label="上传素材"><svg class="icon"><use href="#icon-upload"/></svg></button><button class="icon-button small" data-action="open-asset-picker" title="引用世界书资料" aria-label="引用世界书资料"><svg class="icon"><use href="#icon-book"/></svg></button><span class="composer-hint">Enter 发送 · Shift+Enter 换行</span></div>
+            <button class="send-button" data-action="submit-composer" aria-label="提交创作方向"><svg class="icon"><use href="#icon-send"/></svg></button>
+          </div>
+        </div>
+        <p class="composer-disclaimer" id="composerDisclaimer">正在检测 AI 通道…</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="mobile-overlay" id="mobileOverlay" data-action="close-drawers"></div>
+
+  <div class="modal hidden" id="docModal" role="dialog" aria-modal="true" aria-labelledby="docModalTitle">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <article class="modal-card doc-modal-card">
+      <header><div><span class="tag" id="docModalCategory"></span><h2 id="docModalTitle"></h2></div><button class="icon-button" data-action="close-modal" aria-label="关闭"><svg class="icon"><use href="#icon-x"/></svg></button></header>
+      <div class="modal-body" id="docModalBody"></div>
+      <footer><span id="docModalSource"></span><button class="button primary" id="docCiteButton" data-action="cite-current-doc"><svg class="icon"><use href="#icon-quote"/></svg>引用到创作</button></footer>
+    </article>
+  </div>
+
+  <div class="modal hidden" id="aiSettingsModal" role="dialog" aria-modal="true" aria-labelledby="aiSettingsTitle">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <article class="modal-card settings-modal-card">
+      <header><div><span class="eyebrow">AI CONNECTION</span><h2 id="aiSettingsTitle">DeepSeek 接入设置</h2></div><button class="icon-button" data-action="close-modal" aria-label="关闭"><svg class="icon"><use href="#icon-x"/></svg></button></header>
+      <div class="modal-body">
+        <div class="settings-status" id="aiSettingsStatus"></div>
+
+        <label class="field"><span>连接方式</span>
+          <select id="aiModeSelect">
+            <option value="auto">自动：优先本地代理，其次浏览器直连</option>
+            <option value="server">只使用本地代理（推荐，密钥不出服务端）</option>
+            <option value="direct">浏览器直连 DeepSeek（密钥保存在本机浏览器）</option>
+            <option value="demo">离线演示（不调用模型）</option>
+          </select>
+        </label>
+
+        <div id="directFields">
+          <label class="field"><span>API Key</span>
+            <input id="aiKeyInput" type="password" autocomplete="off" placeholder="sk-…">
+          </label>
+          <label class="field"><span>接口地址</span>
+            <input id="aiBaseInput" type="text" placeholder="https://api.deepseek.com">
+          </label>
+        </div>
+
+        <label class="field"><span>模型</span>
+          <select id="aiModelSelect"></select>
+        </label>
+
+        <label class="field"><span>思考强度</span>
+          <select id="aiEffortSelect">
+            <option value="low">low · 更快，适合续写与考据</option>
+            <option value="high">high · 更深，适合复杂规划</option>
+            <option value="max">max · 最慢，容易耗尽预算</option>
+          </select>
+        </label>
+
+        <div class="settings-note"><svg class="icon"><use href="#icon-info"/></svg><p>本地代理读取 <code>config.local.json</code> 或环境变量 <code>DEEPSEEK_API_KEY</code>，页面只会请求 <code>/api/chat</code>。浏览器直连会把密钥暴露给任何打开此页的人，仅适合本机演示。</p></div>
+        <div class="settings-actions">
+          <button class="button secondary" data-action="test-ai">测试连接</button>
+          <button class="button primary" data-action="save-ai-settings">保存并应用</button>
+        </div>
+        <p class="settings-hint" id="aiTestResult"></p>
+      </div>
+    </article>
+  </div>
+
+  <div class="modal hidden" id="briefModal" role="dialog" aria-modal="true" aria-labelledby="briefModalTitle">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <article class="modal-card settings-modal-card">
+      <header><div><span class="eyebrow">TASK BRIEF</span><h2 id="briefModalTitle">创作任务卡</h2></div><button class="icon-button" data-action="close-modal" aria-label="关闭"><svg class="icon"><use href="#icon-x"/></svg></button></header>
+      <div class="modal-body">
+        <p class="brief-intro">任务卡会注入每次续写。禁止项的字面文字命中会触发重写；语义约束仍需人工核对，篇幅偏离会标记。</p>
+        <label class="field"><span>体裁</span><input id="briefGenre" type="text" placeholder="世情日常番外"></label>
+        <div class="brief-row">
+          <label class="field"><span>叙事人称</span>
+            <select id="briefPov">
+              <option>第三人称限知</option>
+              <option>第一人称</option>
+              <option>第三人称全知</option>
+            </select>
+          </label>
+          <label class="field"><span>每节目标字数</span><input id="briefChars" type="number" min="120" max="2000" step="20" placeholder="360"></label>
+        </div>
+        <label class="field"><span>目标读者</span><input id="briefAudience" type="text" placeholder="熟悉原著的成年读者"></label>
+        <label class="field"><span>基调</span><input id="briefTone" type="text" placeholder="含蓄克制"></label>
+        <label class="field"><span>必须保留（每行一条，可留空）</span><textarea id="briefMustKeep" rows="3" placeholder="不改动原著主线结局&#10;平儿仍是凤姐的贴身丫鬟"></textarea></label>
+        <label class="field"><span>明确禁止（每行一条，命中即重写）</span><textarea id="briefForbidden" rows="3" placeholder="现代词汇&#10;全知旁白"></textarea></label>
+        <div class="settings-actions">
+          <button class="button secondary" data-action="reset-brief">恢复默认</button>
+          <button class="button primary" data-action="save-brief">保存任务卡</button>
+        </div>
+        <p class="settings-hint" id="briefHint"></p>
+      </div>
+    </article>
+  </div>
+
+  <div class="modal hidden" id="assetPickerModal" role="dialog" aria-modal="true" aria-labelledby="assetPickerTitle">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <article class="modal-card picker-modal-card">
+      <header><div><span class="eyebrow">CREATION REFERENCES</span><h2 id="assetPickerTitle">引用世界书资料</h2></div><button class="icon-button" data-action="close-modal" aria-label="关闭"><svg class="icon"><use href="#icon-x"/></svg></button></header>
+      <div class="picker-search"><svg class="icon"><use href="#icon-search"/></svg><input id="assetPickerSearch" type="search" placeholder="搜索要引用的词条"></div>
+      <div class="modal-body picker-list" id="assetPickerList"></div>
+      <footer><span id="selectedAssetCount">已引用 0 项</span><button class="button primary" data-action="close-modal">完成</button></footer>
+    </article>
+  </div>
+
+  <div class="modal hidden" id="perspectiveModal" role="dialog" aria-modal="true" aria-labelledby="perspectiveTitle">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <article class="modal-card perspective-modal-card">
+      <header><div><span class="eyebrow">CREATIVE EXPERIMENT</span><h2 id="perspectiveTitle">同事异见 · 创作实验台</h2></div><button class="icon-button" data-action="close-modal" aria-label="关闭"><svg class="icon"><use href="#icon-x"/></svg></button></header>
+      <div class="modal-body">
+        <p class="brief-intro">同一件事，落在不同人眼里，会生出不同的故事。从当前分支挑一件事，再选择想听谁的看法。</p>
+        <p class="perspective-context" id="perspectiveContext"></p>
+        <p class="perspective-status" id="perspectiveStatus" role="status" aria-live="polite">先选择一件事，再选择 2–4 个人物。</p>
+        <section class="perspective-step"><h3>① 选择一件事</h3><p>来自当前章节与已有的后续方向。</p><div id="perspectiveEvents" class="perspective-options"></div></section>
+        <section class="perspective-step"><h3>② 选择人物 <span id="perspectiveCharacterCount">0 / 4</span></h3><p id="perspectiveCharacterHint">选定事件后，为你推荐相关人物。</p><div id="perspectiveCharacters" class="perspective-people"></div><button class="perspective-more hidden" id="perspectiveMore" data-action="show-perspective-characters">查看全部人物</button></section>
+        <p class="settings-hint">各人所见、理解和未说出口的话均为 AI 提出的创作假设，不会自动写入故事事实。生成和续写都会调用模型。</p>
+        <div class="perspective-actions"><button class="button primary" data-action="generate-perspectives">生成不同看法</button></div>
+        <div id="perspectiveResults"></div>
+      </div>
+    </article>
+  </div>
+
+  <div class="modal hidden" id="sampleModal" role="dialog" aria-modal="true" aria-labelledby="sampleModalTitle">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <article class="modal-card sample-modal-card"><header><div><span class="eyebrow">BENCHMARK SAMPLE</span><h2 id="sampleModalTitle"></h2></div><button class="icon-button" data-action="close-modal" aria-label="关闭"><svg class="icon"><use href="#icon-x"/></svg></button></header><div class="modal-body" id="sampleModalBody"></div></article>
+  </div>
+
+  <div class="modal hidden" id="crossModal" role="dialog" aria-modal="true" aria-labelledby="crossModalTitle">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <article class="modal-card cross-modal-card">
+      <header><div><span class="eyebrow">CROSSOVER</span><h2 id="crossModalTitle">跨界创作</h2></div><button class="icon-button" data-action="close-modal" aria-label="关闭"><svg class="icon"><use href="#icon-x"/></svg></button></header>
+      <div class="modal-body">
+        <p class="brief-intro">把另一本世界书的人物与素材请进当前作品。主世界的规则仍然说了算：外书只提供素材，不提供世界法则。</p>
+
+        <section class="cross-step">
+          <h3>① 引入哪本世界书</h3>
+          <div id="crossWorldList" class="cross-world-list"></div>
+        </section>
+
+        <section class="cross-step">
+          <h3>② 引用该书的哪些作品 <span class="cross-optional">可选</span></h3>
+          <p class="settings-hint">不选也能用整本素材。选了之后，那部作品里已经发生的事会成为本作的前提，优先级高于两本原著。</p>
+          <div id="crossWorkList" class="cross-work-list"></div>
+        </section>
+
+        <section class="cross-step">
+          <h3>③ 外书人物能出多大力</h3>
+          <div id="crossPowerList" class="cross-power-list"></div>
+        </section>
+
+        <section class="cross-step">
+          <h3>④ 两界如何通达</h3>
+          <p class="settings-hint" id="crossBridgeHint">通达方式是必填的。没有它，跨界内容不许生成——否则模型只能硬凑。</p>
+          <div id="crossBridgeList" class="cross-bridge-list"></div>
+          <button class="button secondary compact" data-action="generate-bridges" id="generateBridgesBtn">让 AI 给三个通达选项</button>
+        </section>
+
+        <div id="crossStatus" class="settings-hint" role="status" aria-live="polite"></div>
+      </div>
+      <footer><span id="crossSummary">尚未启用跨界</span><button class="button secondary" data-action="clear-cross">取消跨界</button><button class="button primary" data-action="save-cross">保存设置</button></footer>
+    </article>
+  </div>
+
+  <div class="modal hidden" id="worldModal" role="dialog" aria-modal="true" aria-labelledby="worldModalTitle">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <article class="modal-card world-modal-card">
+      <header><div><span class="eyebrow">WORLDBOOK LIBRARY</span><h2 id="worldModalTitle">选择世界书</h2></div><button class="icon-button" data-action="close-modal" aria-label="关闭"><svg class="icon"><use href="#icon-x"/></svg></button></header>
+      <div class="modal-body">
+        <p class="settings-hint">两本世界书各自独立：资产、预设主角、作品架与主题偏好互不干扰。切换后当前页面会重新载入。</p>
+        <div id="worldPickerList"></div>
+      </div>
+      <footer><span>每本世界书都有自己的创作法则与评测基准。</span><button class="button primary" data-action="close-modal">关闭</button></footer>
+    </article>
+  </div>
+
+  <input type="file" id="libraryBackupInput" accept="application/json,.json" hidden>
+  <input type="file" id="materialFileInput" accept=".txt,.md,.json,text/plain,text/markdown,application/json" hidden>
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+  <!--WORLD_SCRIPTS-->
+  <script src="registry.js?v=1"></script>
+  <script src="ai.js?v=47"></script>
+  <script src="bridge.js?v=1"></script>
+  <script src="app.js?v=53"></script>
+</body>
+</html>

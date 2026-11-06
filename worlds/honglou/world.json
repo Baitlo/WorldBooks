@@ -1,0 +1,22 @@
+{
+  "id": "honglou",
+  "name": "红楼梦",
+  "title": "红楼一梦",
+  "book": "《红楼梦》",
+  "seal": "梦",
+  "cover": "红",
+  "subtitle": "文学 IP 世界书",
+  "tagline": "在同一座大观园，写未曾发生的故事。",
+  "palette": "#913b3b",
+  "paletteSoft": "#f3e7e4",
+  "storageKey": "honglou-worldbook-studio-v2",
+  "globals": { "data": "WORLDBOOK_DATA", "studio": "STUDIO_DATA" },
+  "scripts": [
+    "data.js",
+    "data-lore.js",
+    "data-world.js",
+    "data-deep.js",
+    "data-relations.js",
+    "studio-data.js"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "xiyou",
+  "name": "西游记",
+  "title": "西游一程",
+  "book": "《西游记》",
+  "seal": "游",
+  "cover": "游",
+  "subtitle": "神魔 IP 世界书",
+  "tagline": "同一条取经路，写没有被记下的那一段。",
+  "palette": "#2f6b60",
+  "paletteSoft": "#e4efeb",
+  "storageKey": "xiyou-worldbook-studio-v2",
+  "globals": { "data": "XIYOU_WORLDBOOK", "studio": "XIYOU_STUDIO" },
+  "scripts": [
+    "data-xiyou.js",
+    "data-xiyou-figures.js",
+    "data-xiyou-figures2.js",
+    "data-xiyou-world.js",
+    "studio-xiyou.js"
+  ]
+}

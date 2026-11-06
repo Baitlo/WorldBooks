@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "note": "世界书目录。新增一本世界书只需在此追加一项，并在 worlds/<id>/ 放入 world.json 与数据文件，无需改任何 JS。",
+  "assets": "assets/",
+  "worlds": ["honglou", "xiyou"]
+}
