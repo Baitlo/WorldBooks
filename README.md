@@ -36,17 +36,17 @@
 
 ## 快速开始
 
-**前置要求**：Python 3.9+、一部可用的 DeepSeek API Key。无需 Node、无需 npm、无需构建。
+**前置要求**：Python 3.9+，以及一部可用的模型 API Key（默认 DeepSeek）。无需 Node、无需 npm、无需构建。
 
 ```bash
 git clone https://github.com/Baitlo/WorldBooks.git
 cd WorldBooks
 
-# 配置密钥（此文件已在 .gitignore）
-cp config.example.json config.local.json   # 若仓库无此模板，直接新建，见下
+# 生成配置模板（config.local.json 已在 .gitignore，不会被提交）
+cp config.example.json config.local.json
 ```
 
-`config.local.json` 最小内容：
+`config.local.json` 最小内容（把 `api_key` 换成你自己的）：
 
 ```json
 {
@@ -56,6 +56,8 @@ cp config.example.json config.local.json   # 若仓库无此模板，直接新�
   "base_url": "https://api.deepseek.com"
 }
 ```
+
+也可以跳过这个文件，改用环境变量 `export DEEPSEEK_API_KEY=sk-...`。
 
 启动：
 
@@ -721,6 +723,8 @@ CMD ["python3", "server.py"]
 - **路径穿越拦截**：百分号解码后、规范化前拒绝 `..`。
 - **同源校验**：`/api/chat` 与 `/api/library` 的 `Origin` 必须匹配 `Host`，外部站点拿不到 403。
 - **密钥不出服务端**：浏览器只与 `/api/chat` 通信，上游鉴权头由 `server.py` 添加。
+
+需要注意，`/api/health` 会返回 `key_hint`，即密钥的**前 6 位与后 4 位**（形如 `sk-abc…wxyz`），用于让你确认「当前生效的是哪一把钥匙」。完整的密钥永远不出服务端，但只要服务能被别人访问，这个片段也会被看到。它不足以还原密钥，不过如果你在意，就别把服务暴露到不可信网络。
 
 **没有内置鉴权、没有限流、没有多用户。** 因此：
 
