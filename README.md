@@ -1,19 +1,21 @@
 # Worldbook Studio · 多世界书 AI 文学二创工作台
 
-同一套代码，跑两本世界书：**《红楼梦》**与**《西游记》**。每本世界书有自己的创作法则、人物档案、关系网、预设主角与评测基准，作品架与主题偏好互相隔离。
+把一部 IP 的世界观拆成**可检索、可注入、可复用**的知识资产，再让模型在这套资产上持续写新故事。
 
-真实接入 DeepSeek，作品存 SQLite 共享库，由 macOS LaunchAgent 常驻，局域网多设备可用。
+同一套代码跑两本世界书：**《红楼梦》**与**《西游记》**。每本书有自己的创作法则、人物档案、关系网、预设主角与评测基准；作品架与主题偏好互相隔离，通过同一套注册表同时装载，因此可以**跨书引用**——在红楼梦的作品里请进西游记的人物，或反过来。
 
 核心链路：**世界书资产 → 理解创作需求 → 三条差异化路线 → 用户选择 → 分支续写 → 创作质量评测**。
 
-访问 <http://192.168.1.20:8080>（无参数）进**书架**，选一本进工作台。
-
-| 世界书 | 入口 | 资产 | 人物 | 关系 | 世界设定 |
+| 世界书 | 资产 | 人物 | 关系 | 世界设定 | 创作法则 |
 |---|---|---|---|---|---|
-| 红楼梦 | <http://192.168.1.20:8080/?world=honglou> | 249 | 42 | 90 | 24 |
-| 西游记 | <http://192.168.1.20:8080/?world=xiyou> | 191 | 33 | 60 | 20 |
+| 红楼梦 | 249 | 42 | 90 | 24 | 12 |
+| 西游记 | 191 | 33 | 60 | 20 | 12 |
 
-两本书可以**跨书引用**：在红楼梦的作品里引入西游记的人物，或反过来。见「跨界创作」。
+技术上是**零第三方依赖**的单进程应用：Python 3 标准库提供静态服务与两个 API，前端是原生 HTML/CSS/JS，作品存 SQLite。接任何 OpenAI 兼容接口（默认 DeepSeek）。
+
+> **这里没有在线 Demo。** 本仓库是源码，不附带托管实例——任何在文档里出现的地址都是**你自己机器**上的。按「快速开始」跑起来即可得到 `http://localhost:8080`。
+>
+> 之所以不提供公网演示：这个应用没有鉴权、没有限流、没有多用户，而且每次生成都消耗**你配置的**模型额度。想要公网访问，请自行加带鉴权的反向代理，见「自托管 → 安全边界」。
 
 ## 界面速览
 
@@ -34,32 +36,59 @@
 
 ## 快速开始
 
-项目已在正式运行，通常**不需要手动启动**：
+**前置要求**：Python 3.9+、一部可用的 DeepSeek API Key。无需 Node、无需 npm、无需构建。
 
 ```bash
-# 查看是否在跑
-launchctl print gui/$(id -u)/com.bona.honglou-worldbook | grep state
+git clone https://github.com/Baitlo/WorldBooks.git
+cd WorldBooks
+
+# 配置密钥（此文件已在 .gitignore）
+cp config.example.json config.local.json   # 若仓库无此模板，直接新建，见下
+```
+
+`config.local.json` 最小内容：
+
+```json
+{
+  "api_key": "sk-你的密钥",
+  "model": "deepseek-flash",
+  "reasoning_effort": "low",
+  "base_url": "https://api.deepseek.com"
+}
+```
+
+启动：
+
+```bash
+python3 server.py
+```
+
+打开 <http://localhost:8080>。无参数进**书架**，选一本进工作台；带参数可直接进某本：<http://localhost:8080/?world=honglou>、<http://localhost:8080/?world=xiyou>。
+
+验证服务正常：
+
+```bash
 curl -s http://localhost:8080/api/health
 ```
 
-访问 <http://192.168.1.20:8080>（局域网）或 <http://localhost:8080>（本机）。
+返回 `ok: true` 且 `model` 与思考强度正确即可开始。想换端口用 `PORT=8090 python3 server.py`。
 
-手动调试（**先停 LaunchAgent，否则端口冲突**）：
-
-```bash
-launchctl bootout gui/$(id -u)/com.bona.honglou-worldbook
-HOST=0.0.0.0 python3 server.py          # 前台，Ctrl+C 停止
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.bona.honglou-worldbook.plist   # 恢复
-```
+**没有 API Key 也能看**：页面右上角齿轮 → 连接方式选「离线演示」，可用本地预设数据浏览资产、关系图与评测基准，只是不调用模型。
 
 ---
 
 ## 目录
 
+- [快速开始](#快速开始)
+- [界面速览](#界面速览)
 - [多世界书架构](#多世界书架构)
   - [加一本新世界书](#加一本新世界书)
   - [Studio 契约](#studio-契约)
 - [跨界创作](#跨界创作)
+  - [四步设置](#四步设置)
+  - [引用既有作品](#引用既有作品)
+  - [六条仲裁条款](#六条仲裁条款)
+  - [跨书资产 ID](#跨书资产-id)
 - [技术栈与架构](#技术栈与架构)
 - [文件职责](#文件职责)
 - [维护索引：改 X 动哪里](#维护索引改-x-动哪里)
@@ -69,18 +98,27 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.bona.honglou-worldbo
 - [世界书资料](#世界书资料)
   - [《西游记》（191 项）](#西游记191-项)
   - [《红楼梦》（249 项）](#红楼梦249-项)
+  - [角色覆盖](#角色覆盖)
+  - [人物关系](#人物关系)
+  - [来源与标注](#来源与标注)
 - [运行时机制](#运行时机制)
+  - [三层渐进式披露](#三层渐进式披露)
   - [上下文注入与两阶段选卡](#上下文注入与两阶段选卡)
   - [任务卡](#任务卡)
   - [思考强度与输出预算](#思考强度与输出预算)
   - [故事状态快照](#故事状态快照)
-- [部署与运维](#部署与运维)
-  - [LaunchAgent](#launchagent)
-  - [局域网访问与安全](#局域网访问与安全)
+- [自托管](#自托管)
+  - [局域网内多设备访问](#局域网内多设备访问)
+  - [开机常驻（macOS）](#开机常驻macos)
+  - [用容器跑](#用容器跑可选未随仓库提供)
+  - [安全边界](#安全边界)
   - [密钥配置](#密钥配置)
 - [共享作品库](#共享作品库)
 - [测试](#测试)
+  - [跨界测试覆盖什么](#跨界测试覆盖什么)
+  - [两条端到端手工验证](#两条端到端手工验证)
 - [已知限制](#已知限制)
+- [许可](#许可)
 
 ---
 
@@ -278,24 +316,23 @@ AI 生成的三个选项差异必须落在**代价结构**上，不能是同一�
 **前端脚本加载顺序有依赖，不可调换**（见 `index.html` 末尾）：
 
 ```text
-worlds.js
-  → data.js → data-lore.js → data-world.js → data-deep.js → data-relations.js → studio-data.js
-  → data-xiyou.js → data-xiyou-figures.js → data-xiyou-figures2.js
-  → data-xiyou-world.js → studio-xiyou.js
-  → world-select.js
-  → ai.js → app.js
+worlds/<id>/*.js     按 world.json 的 scripts 数组注入（经 <!--WORLD_SCRIPTS--> 占位）
+  → registry.js      等全部世界数据就绪后才建注册表
+  → ai.js
+  → bridge.js
+  → app.js
 ```
 
-`data-lore` / `data-deep` 直接修改 `data.js` 已构造的对象；`data-relations` 整体替换 `relationship_edges`。西游的四个数据文件同理，最后一个 `data-xiyou-world.js` 补事件、场景与原创素材。
+各世界内部，数据文件之间也有顺序：`data-lore` / `data-deep` 直接修改 `data.js` 已构造的对象，`data-relations` 整体替换 `relationship_edges`。西游的四个数据文件同理，最后一个 `data-xiyou-world.js` 补事件、场景与原创素材。
 
-`world-select.js` **必须在 `ai.js` 之前**执行，否则 `ai.js` 读到的是红楼梦的数据。
+`registry.js` **必须在所有世界数据之后、`ai.js` 之前**执行，否则 `ai.js` 读到的是未就绪或错本的全局变量。
 
 ---
 
 ## 文件职责
 
 ```text
-honglou-worldbook/
+WorldBooks/
 ├── index.html                   工作台骨架、三栏布局、所有弹窗、<!--WORLD_SCRIPTS--> 占位
 ├── shelf.html                   书架页：每本世界书一张卡片
 ├── shelf.js                     书架渲染（读注册表 + /api/shelf）
@@ -325,9 +362,12 @@ honglou-worldbook/
 │       └── studio-xiyou.js              西游记 Studio 配置
 │
 ├── assets/                      16 张清·孙温《绘全本红楼梦》配图（公有领域，仅红楼梦）
+├── docs/screenshots/            README 引用的界面截图
 ├── storage/                     SQLite 库、服务日志（已 gitignore）
-├── tests/                       4 个测试文件，见「测试」
-├── config.local.json            本地密钥（已 gitignore，切勿外传）
+├── tests/                       5 个 Node 测试 + 1 个 Python 测试，见「测试」
+├── config.example.json          配置模板，可安全提交
+├── config.local.json            你的真实密钥（已 gitignore，切勿外传）
+├── LICENSE                      个人使用许可，使用前请读
 └── .gitignore
 ```
 
@@ -381,7 +421,7 @@ honglou-worldbook/
 
 1. **新增前端文件要改两处**：`index.html` 加 `<script>`，`server.py` 的 `PUBLIC_FILES` 加文件名。漏了后者会 404，页面白屏。
 2. **静态资源带版本参数**（`?v=43`）。改完 JS/CSS 若浏览器仍用旧文件，把 `index.html` 里的版本号统一 +1。
-3. **`world-select.js` 的位置不能动**。它必须排在两本书的数据文件之后、`ai.js` 之前；排错会让 `ai.js` 拿到另一本书的数据，症状是提示词与资产对不上却完全不报错。
+3. **`registry.js` 的位置不能动**。它必须排在所有世界的数据文件之后、`ai.js` 之前；排错会让 `ai.js` 拿到未就绪或错本的全局变量，症状是提示词与资产对不上却完全不报错。
 4. **别在 `app.js` / `ai.js` 里写死某一本书的内容**。人物简称、法则 ID、Benchmark 人物、界面文案都已外置到 `STUDIO`，写死会让另一本书串味。判据：在两本书下各跑一遍页面，搜不到对方的专名。
 5. **SVG 的 `font-size` 属性压不过 CSS 的 `font` 简写**。关系图给大簇缩字号用的是内联 `style`，改回呈现属性会失效。
 
@@ -556,51 +596,139 @@ honglou-worldbook/
 
 ---
 
-## 部署与运维
+## 自托管
 
-### LaunchAgent
+这是一个**单文件服务**：不需要数据库服务器、不需要 Node、不需要反向代理就能跑。默认只监听 `127.0.0.1`，安全边界靠你显式打开。
 
-已有配置：`~/Library/LaunchAgents/com.bona.honglou-worldbook.plist`（`KeepAlive` + `RunAtLoad`，带 `HOST=0.0.0.0`）。
+### 局域网内多设备访问
 
-```bash
-# 状态
-launchctl print gui/$(id -u)/com.bona.honglou-worldbook
+> 这一节讲的是**方法**。下面的 `192.168.x.x` 只是示例占位，不是任何真实可访问的地址；你自己的那个由命令查出来。
 
-# 重启（改完 server.py 后执行）
-launchctl kickstart -k gui/$(id -u)/com.bona.honglou-worldbook
-
-# 停止 / 恢复
-launchctl bootout gui/$(id -u)/com.bona.honglou-worldbook
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.bona.honglou-worldbook.plist
-```
-
-**只改前端（HTML/CSS/JS）不需要重启服务**，刷新页面即可。改 `server.py` 需要 kickstart。
-
-日志：`storage/server.log`、`storage/server.err.log`。
-
-限制：Mac 需开机、用户登录、未休眠。睡眠或退出登录时其他设备无法访问。
-
-### 局域网访问与安全
+想让手机或同网段的另一台电脑打开，先让服务监听所有网卡：
 
 ```bash
-# 排障顺序
-lsof -nP -i :8080                      # 应显示 *:8080 而非 127.0.0.1:8080
-curl -s http://192.168.1.20:8080/      # 本机测局域网 IP
+HOST=0.0.0.0 python3 server.py
 ```
 
-环境变量：
+再查本机在当前网络里的地址：
+
+```bash
+# macOS
+ipconfig getifaddr en0
+# Linux
+hostname -I | awk '{print $1}'
+```
+
+命令会返回一个私有网段地址，其他设备访问 `http://<你查到的地址>:8080` 即可。
+
+这个地址**属于你自己的网络**，每台机器、每次换网都会变，也无法从公网访问。它是私有网段（`10.x`、`172.16–31.x`、`192.168.x`）地址，公网上的任何人都不可能连上——这正是它安全的原因，也是它不能写进文档给别人的原因。
+
+排障顺序：
+
+```bash
+lsof -nP -i :8080        # 应显示 *:8080；若显示 127.0.0.1:8080 说明没设 HOST
+curl -s http://localhost:8080/api/health
+```
+
+仍打不开时依次检查：手机与电脑是否同一网段、系统防火墙是否放行 Python、路由器是否开了 AP 隔离。
+
+### 开机常驻（macOS）
+
+可选。用 LaunchAgent 让服务在登录后自动启动并在崩溃后重启：
+
+```bash
+cat > ~/Library/LaunchAgents/com.example.worldbooks.plist <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.example.worldbooks</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/绝对路径/WorldBooks/server.py</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict><key>HOST</key><string>0.0.0.0</string></dict>
+  <key>WorkingDirectory</key><string>/绝对路径/WorldBooks</string>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/绝对路径/WorldBooks/storage/server.log</string>
+  <key>StandardErrorPath</key><string>/绝对路径/WorldBooks/storage/server.err.log</string>
+</dict></plist>
+PLIST
+
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.example.worldbooks.plist
+```
+
+把 `/绝对路径/WorldBooks` 换成 `pwd` 的输出。之后：
+
+```bash
+launchctl print gui/$(id -u)/com.example.worldbooks   # 查看状态
+launchctl kickstart -k gui/$(id -u)/com.example.worldbooks   # 改完 server.py 后重启
+launchctl bootout gui/$(id -u)/com.example.worldbooks  # 停止
+```
+
+Linux 用 systemd user unit 等价替换；容器化部署见下节提示。
+
+给 systemd 的一个最小 unit（`~/.config/systemd/user/worldbooks.service`）：
+
+```ini
+[Unit]
+Description=Worldbook Studio
+After=network.target
+
+[Service]
+WorkingDirectory=%h/WorldBooks
+Environment=HOST=0.0.0.0
+ExecStart=/usr/bin/python3 %h/WorldBooks/server.py
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+```
+
+之后 `systemctl --user daemon-reload && systemctl --user enable --now worldbooks`。
+
+**只改前端（HTML/CSS/JS）不需要重启服务**，刷新页面即可；改 `server.py` 需要重启。
+
+### 用容器跑（可选，未随仓库提供）
+
+仓库不含 Dockerfile，因为服务只依赖 Python 标准库。若你需要容器化，一个能用的最小起点：
+
+```dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+COPY . .
+ENV HOST=0.0.0.0 PORT=8080
+EXPOSE 8080
+CMD ["python3", "server.py"]
+```
+
+注意两点：必须挂载 `storage/`（否则容器重启丢作品库），`config.local.json` 建议用只读挂载注入而不是打进镜像。这份 Dockerfile 只是一个起点，未随版本做过完整验证，请自行确认。
+
+### 安全边界
 
 | 变量 | 默认 | 说明 |
 |---|---|---|
-| `HOST` | `127.0.0.1` | 设 `0.0.0.0` 才对外开放（LaunchAgent 已设） |
+| `HOST` | `127.0.0.1` | 设 `0.0.0.0` 才对外开放 |
 | `PORT` | `8080` | 端口 |
-| `ALLOWED_ORIGINS` | 空 | 额外允许的跨源来源 |
+| `ALLOWED_ORIGINS` | 空 | 额外允许的跨源来源，逗号分隔 |
+| `WORLDBOOK_DB_PATH` | `storage/worldbook.sqlite3` | 作品库位置 |
 
-**静态白名单**：`PUBLIC_FILES` 放行 10 个文件 + `assets/`。`config.local.json`、`server.py`、`README.md`、`storage/` 一律 404。路径校验在百分号解码后、规范化前拦截 `..`。
+已内建的防护：
 
-**同源校验**：`/api/chat` 与 `/api/library` 的 `Origin` 必须匹配 `Host` 头，外部站点 403。
+- **静态白名单**：只放行 `PUBLIC_FILES` 里的根目录文件与 `assets/`、`worlds/` 前缀。`config.local.json`、`server.py`、`README.md`、`storage/` 一律 404。
+- **路径穿越拦截**：百分号解码后、规范化前拒绝 `..`。
+- **同源校验**：`/api/chat` 与 `/api/library` 的 `Origin` 必须匹配 `Host`，外部站点拿不到 403。
+- **密钥不出服务端**：浏览器只与 `/api/chat` 通信，上游鉴权头由 `server.py` 添加。
 
-**没有登录和限流。** 开放到局域网 = 把密钥额度共享给同网段所有人。仅用于可信网络，**切勿暴露公网**。
+**没有内置鉴权、没有限流、没有多用户。** 因此：
+
+- ✅ 可以在**可信局域网**（家里、自己团队内网）里给几台设备用
+- ⚠️ 想放到公网，**必须**自己在前面加一层带鉴权的反向代理（Nginx + Basic Auth / OAuth2 Proxy / Cloudflare Access），并配置 HTTPS
+- ❌ 不要直接把 `HOST=0.0.0.0` 的服务端口映射到公网——那等于把你的模型额度公开给所有人
+
+关于「公网地址」的一个常见误解：你在文档、截图或群里看到的 `192.168.x.x` / `10.x.x.x` / `172.16–31.x.x` 都是 RFC 1918 私有地址，只在**你自己的局域网内**可路由，公网上的机器永远连不上。所以本仓库的文档只写 `localhost`，把「怎么查你自己的局域网地址」写成命令，而不是写死一个地址——写死的那个对任何人都没用。
 
 ### 密钥配置
 
@@ -609,13 +737,13 @@ curl -s http://192.168.1.20:8080/      # 本机测局域网 IP
 1. `config.local.json` 的 `api_key`（**以此为准**）
 2. 环境变量 `DEEPSEEK_API_KEY`（仅当配置文件无密钥时启用）
 
-若两者同时存在且不同，`/api/health` 返回 `env_shadowed: true`，启动日志会警告。这是实测踩过的坑——曾长期用错密钥。
+两者同时存在且不同时，`/api/health` 返回 `env_shadowed: true`，启动日志会告警。这是个容易踩的坑：配置文件静默压过环境变量，改环境变量不生效。
 
-可选变量：`DEEPSEEK_MODEL`、`DEEPSEEK_EFFORT`、`DEEPSEEK_BASE_URL`、`WORLDBOOK_DB_PATH`。
+其他可选变量：`DEEPSEEK_MODEL`、`DEEPSEEK_EFFORT`、`DEEPSEEK_BASE_URL`。
 
 页面右上角齿轮可切模型（`deepseek-flash` / `deepseek-v4-pro`）、思考强度、连接方式（自动 / 只走代理 / 浏览器直连 / 离线演示）。
 
-`config.local.json` 已在 `.gitignore`。**不要提交或分享。**
+`config.local.json` 已在 `.gitignore`。**提交前务必确认它没被 `git add -f` 加进去。**
 
 ---
 
@@ -655,20 +783,18 @@ SQLite 保留最近 100 个历史版本，但**不能代替异机备份**。作�
 无 npm 依赖，直接跑：
 
 ```bash
-cd /Users/baiweikang/Projects/Bona/honglou-worldbook
-
-# Python：存储、并发、冲突、同源
+# Python：存储、并发、冲突、同源（标准库 unittest，无需 pytest）
 python3 -m unittest tests/test_storage.py -v
 
-# Node：五个前端/逻辑测试
+# Node：五个前端/逻辑测试，无需安装任何包
 node tests/library_sync.test.cjs
 node tests/perspectives.test.cjs
 node tests/two_stage.test.cjs
 node tests/perspective_picker.test.cjs
-node tests/cross_world.test.cjs     # 跨界：37 条断言
+node tests/cross_world.test.cjs     # 跨界：40 条断言
 ```
 
-四套测试都在**红楼梦数据**下运行，西游没有独立测试，靠下面的双世界校验脚本兜底。
+五套 Node 测试的主数据是**红楼梦**，西游的覆盖靠 `cross_world` 里的「反向跨界」一组和文末的双世界校验脚本兜底。
 
 ### 跨界测试覆盖什么
 
@@ -736,12 +862,6 @@ xiyou 资产 191 角色 33 关系 60 悬空 0 未分簇 0 法则缺失 0
 ```
 
 未分簇不为 0 不会报错（会自动进「其他人物」簇），但说明关系图该补分组了。新增的书只要出现在输出里且悬空为 0，装载链路就是通的。
-text
-honglou 资产 249 角色 42 关系 90 悬空边 0 未分簇 0 法则缺失 0
-xiyou 资产 191 角色 33 关系 60 悬空边 0 未分簇 0 法则缺失 0
-```
-
-未分簇不为 0 不会报错（会自动进「其他人物」簇），但说明关系图该补分组了。
 
 ---
 
@@ -749,19 +869,20 @@ xiyou 资产 191 角色 33 关系 60 悬空边 0 未分簇 0 法则缺失 0
 
 **多世界书**
 
-- 西游的 4 套 Node 测试**没有覆盖**，只在红楼梦数据下跑过；西游靠双世界校验脚本与浏览器手工验收
+- 西游的 Node 测试**覆盖较薄**：5 套测试主要在红楼梦数据下跑，西游靠双世界校验脚本与浏览器手工验收
 - `STUDIO.ui` 缺字段会静默回落到红楼梦的措辞，不会报错。新增世界书后要按「Studio 契约」表逐项核对，否则会串味
 - 关系图分簇要手工维护：新人物不进 `relationGroups` 会被收进「其他人物」簇，不报错但会挤在一起
 - 两本书的 `localStorage` 作品各自独立合并到服务端，切换世界**不会**触发另一本的迁移
 
 **跨界**
 
-- 跨界的**模型产出质量**仍只能人工判断：37 条自动化断言测的是提示词组装与约束传递，不是生成文本是否好看、是否真的守住了氛围
+- 跨界的**模型产出质量**仍只能人工判断：40 条自动化断言测的是提示词组装与约束传递，不是生成文本是否好看、是否真的守住了氛围
 - 外书只进主世界的作品，不能反过来「把红楼梦写进西游记的作品」再切回红楼梦——桥接绑定在作品上，跨作品不通用
 - 一次只支持引入一本外书。多本同时引入的候选池与仲裁复杂度会显著上升，暂未支持
 - 力量档的「受限」靠提示词约束，**不是硬校验**。模型仍可能让外书人物过度发力，需要人工审读
-- 通达方式是 AI 一次生成的，作者只能选不能改。想微调得重新生成
-- 外书卡的自动检索门槛刻意设得高（必须在正文或本幕方向里明确提到），漏召回比误召回更常见——手动固定是可靠的兜底
+- 通达方式是 AI 一次生成的，用户只能选不能改。想微调得重新生成
+- 外书卡的自动检索门槛刻意设得高（必须在正文或本幕方向里明确提到），漏召回比误召回更常见
+- **外书卡尚未接入界面**：检索层与提示词层已经能用外书资产（模型会按名字自动取到），但「引用资料」选择器、世界书浏览页、视角实验台的人物列表仍只列主世界条目。因此在界面上**手动固定外书卡目前做不到**，只能依赖自动检索命中
 
 **模型与成本**
 
@@ -780,9 +901,8 @@ xiyou 资产 191 角色 33 关系 60 悬空边 0 未分簇 0 法则缺失 0
 **工程**
 
 - 无鉴权、无限流，仅限可信网络
-- 单文件 `app.js` 已达 2604 行，继续膨胀前应拆分
+- 单文件 `app.js` 已达 3000 行，继续膨胀前应拆分
 - 妖王簇 13 人已是环状布局的上限。再多几个簇就得换力导向布局，现在的排斥松弛撑不住
-- 项目**尚未纳入 Git**。`.gitignore` 已就绪，建议尽快 `git init` 以便追溯与回滚
 
 ## 许可
 

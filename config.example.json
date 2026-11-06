@@ -1,0 +1,7 @@
+{
+  "_comment": "复制为 config.local.json 后填入自己的密钥。config.local.json 已在 .gitignore，不会被提交。",
+  "api_key": "",
+  "model": "deepseek-flash",
+  "reasoning_effort": "low",
+  "base_url": "https://api.deepseek.com"
+}
